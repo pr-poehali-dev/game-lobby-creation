@@ -331,7 +331,7 @@ const Index = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 from-acid-green to-acid-purple rounded-lg flex items-center justify-center bg-[#ffffff00]">
+          <div className="w-12 h-12 from-acid-green to-acid-purple rounded-lg flex items-center justify-center bg-[#00ff1100]">
             <Icon name="Gamepad2" size={24} className="text-black" />
           </div>
           <div>
