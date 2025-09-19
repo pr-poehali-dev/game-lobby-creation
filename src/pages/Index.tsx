@@ -42,8 +42,12 @@ const Index = () => {
   const [isJoined, setIsJoined] = useState(false)
   const [userLevel, setUserLevel] = useState(1)
   const [userAvatar, setUserAvatar] = useState('🎮')
+  const [showAvatarGallery, setShowAvatarGallery] = useState(false)
 
-  const avatars = ['🎮', '⚡', '🚀', '💫', '⭐', '🔥', '👾', '🎯', '⚔️', '🛡️']
+  const avatars = ['🎮', '⚡', '🚀', '💫', '⭐', '🔥', '👾', '🎯', '⚔️', '🛡️', '🤖', '👽', '💀', '🎭', '🐲', '🦾', '👹', '🤡', '🦸', '🧙']
+  const avatarImages = [
+    '/img/9b80cde4-6702-47fc-8c0f-edceee1edb3a.jpg'
+  ]
 
   // Загрузка состояния лобби
   const loadLobbyState = async () => {
@@ -191,8 +195,8 @@ const Index = () => {
             <div className="w-16 h-16 bg-gradient-to-r from-acid-green to-acid-purple rounded-full mx-auto mb-4 flex items-center justify-center">
               <Icon name="Gamepad2" size={32} className="text-black" />
             </div>
-            <CardTitle className="text-2xl bg-gradient-to-r from-acid-green to-acid-purple bg-clip-text text-transparent">
-              TOXIC LOBBY 5v5
+            <CardTitle className="text-2xl text-acid-green">
+              OrkeN Lobby 5 vs 5
             </CardTitle>
             <p className="text-muted-foreground">Присоединяйся к игре</p>
           </CardHeader>
@@ -222,18 +226,61 @@ const Index = () => {
             
             <div>
               <label className="text-sm text-acid-green mb-2 block">Аватар</label>
-              <div className="grid grid-cols-5 gap-2">
-                {avatars.map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => setUserAvatar(emoji)}
-                    className={`p-2 rounded border-2 text-xl hover:bg-gaming-dark/50 transition ${
-                      userAvatar === emoji ? 'border-acid-green' : 'border-border/30'
-                    }`}
-                  >
-                    {emoji}
-                  </button>
-                ))}
+              <div className="space-y-3">
+                <div className="grid grid-cols-5 gap-2">
+                  {avatars.slice(0, 10).map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => setUserAvatar(emoji)}
+                      className={`p-2 rounded border-2 text-xl hover:bg-gaming-dark/50 transition ${
+                        userAvatar === emoji ? 'border-acid-green' : 'border-border/30'
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+                
+                <Button
+                  type="button"
+                  onClick={() => setShowAvatarGallery(!showAvatarGallery)}
+                  className="w-full bg-acid-purple/20 text-acid-purple border border-acid-purple/30 hover:bg-acid-purple/30"
+                >
+                  <Icon name="Image" size={16} className="mr-2" />
+                  {showAvatarGallery ? 'Скрыть галерею' : 'Показать больше аватаров'}
+                </Button>
+                
+                {showAvatarGallery && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-5 gap-2">
+                      {avatars.slice(10).map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => setUserAvatar(emoji)}
+                          className={`p-2 rounded border-2 text-xl hover:bg-gaming-dark/50 transition ${
+                            userAvatar === emoji ? 'border-acid-green' : 'border-border/30'
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="border-t border-border/30 pt-3">
+                      <p className="text-xs text-acid-green mb-2">Кибер-аватары</p>
+                      <div className="relative">
+                        <img 
+                          src={avatarImages[0]} 
+                          alt="Gaming avatars"
+                          className="w-full h-32 object-cover rounded-lg border border-acid-green/30"
+                        />
+                        <div className="absolute inset-0 bg-gaming-bg/80 rounded-lg flex items-center justify-center">
+                          <p className="text-acid-green text-sm font-medium">Скоро доступно</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -264,10 +311,10 @@ const Index = () => {
             <Icon name="Gamepad2" size={24} className="text-black" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-acid-green to-acid-purple bg-clip-text text-transparent">
-              TOXIC LOBBY 5v5
+            <h1 className="text-3xl font-bold text-acid-green">
+              OrkeN Lobby 5 vs 5
             </h1>
-            <p className="text-muted-foreground">Кислотное игровое лобби</p>
+            <p className="text-acid-purple">Кислотное игровое лобби</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
