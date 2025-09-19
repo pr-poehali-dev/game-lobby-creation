@@ -338,7 +338,7 @@ const Index = () => {
             <h1 className="text-3xl font-bold text-acid-green">
               OrkeN Lobby 5 vs 5
             </h1>
-            <p className="text-acid-purple">Кислотное игровое лобби</p>
+            <p className="text-[#1cff00]">Кислотное игровое лобби</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
