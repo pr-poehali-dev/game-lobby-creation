@@ -16,6 +16,7 @@ interface Player {
   team_name?: string
   team_color?: string
   joined_at: string
+  is_admin?: boolean
 }
 
 interface ChatMessage {
@@ -133,6 +134,29 @@ const Index = () => {
       console.error('Ошибка назначения команды:', error)
     }
   }
+
+  // Выгнать игрока (только для админа)
+  const kickPlayer = async (playerId: string) => {
+    if (currentUser !== 'neflixxx666') return
+    
+    try {
+      await fetch(LOBBY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'kick_player',
+          admin_username: currentUser,
+          target_player_id: playerId
+        })
+      })
+      loadLobbyState()
+    } catch (error) {
+      console.error('Ошибка выгона игрока:', error)
+    }
+  }
+
+  // Проверка прав админа
+  const isCurrentUserAdmin = currentUser === 'neflixxx666'
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -420,7 +444,14 @@ const Index = () => {
                     <div className="flex items-center space-x-3">
                       <div className="text-lg">{player.avatar_emoji}</div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{player.username}</h3>
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-foreground">{player.username}</h3>
+                          {player.is_admin && (
+                            <Badge className="text-xs bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow px-1 py-0">
+                              ADMIN
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex items-center space-x-2">
                           <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
                           <span className="text-xs text-muted-foreground">LVL {player.level}</span>
@@ -443,6 +474,16 @@ const Index = () => {
                     >
                       Б
                     </Button>
+                    {isCurrentUserAdmin && player.username !== 'neflixxx666' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => kickPlayer(player.id)}
+                        className="h-7 text-xs bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+                        title="Выгнать игрока"
+                      >
+                        <Icon name="X" size={12} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
