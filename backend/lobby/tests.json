@@ -1,0 +1,34 @@
+{
+  "tests": [
+    {
+      "name": "Get lobby state",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "players": "array",
+        "lobby": "object",
+        "messages": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Join lobby",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "join",
+        "username": "TestPlayer",
+        "level": 5,
+        "avatar": "🎮"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "player": "object",
+        "session_id": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
