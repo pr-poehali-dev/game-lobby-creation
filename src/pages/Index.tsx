@@ -155,6 +155,23 @@ const Index = () => {
     }
   }
 
+  // Экстренная полная очистка (для отладки)
+  const forceClearAll = async () => {
+    try {
+      await fetch(LOBBY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'force_clear_all'
+        })
+      })
+      // Перезагружаем страницу для полного сброса
+      window.location.reload()
+    } catch (error) {
+      console.error('Ошибка экстренной очистки:', error)
+    }
+  }
+
   // Очистить лобби (только для админа)
   const clearLobby = async () => {
     if (currentUser !== 'neflixxx666') return
@@ -368,6 +385,15 @@ const Index = () => {
           <Badge className="bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow">
             {currentUser}
           </Badge>
+          <Button 
+            onClick={forceClearAll}
+            className="bg-red-600/80 text-white border border-red-500 hover:bg-red-600"
+            size="sm"
+            title="ЭКСТРЕННАЯ ОЧИСТКА - удалит всех игроков и сообщения"
+          >
+            <Icon name="RotateCcw" size={16} className="mr-1" />
+            СБРОС
+          </Button>
         </div>
       </div>
 
