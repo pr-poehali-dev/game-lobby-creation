@@ -175,6 +175,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': True})
                 }
             
+            elif action == 'clear_lobby':
+                admin_username = body_data.get('admin_username')
+                
+                # Проверяем права админа
+                if admin_username != 'neflixxx666':
+                    return {
+                        'statusCode': 403,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Нет прав администратора'})
+                    }
+                
+                # Очищаем всех игроков
+                cur.execute("DELETE FROM players")
+                conn.commit()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'success': True})
+                }
+            
             elif action == 'send_message':
                 username = body_data.get('username')
                 message = body_data.get('message')
