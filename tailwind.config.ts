@@ -61,13 +61,7 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				'acid-green': '#39FF14',
-				'acid-purple': '#BF00FF',
-				'toxic-yellow': '#CCFF00',
-				'gaming-bg': '#0A0A0A',
-				'gaming-dark': '#1A0A1A',
-				'gaming-secondary': '#2A1A2A'
+				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
