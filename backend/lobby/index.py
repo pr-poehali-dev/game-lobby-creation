@@ -46,7 +46,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 SELECT p.*, t.name as team_name, t.color as team_color 
                 FROM players p 
                 LEFT JOIN teams t ON p.team_id = t.id 
-                ORDER BY p.is_admin DESC, p.joined_at
+                ORDER BY p.joined_at
             """)
             players = [dict(row) for row in cur.fetchall()]
             
@@ -98,18 +98,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Удаляем старые записи игрока если есть
                 cur.execute("DELETE FROM players WHERE username = %s", (username,))
                 
-                # Проверяем админа и добавляем игрока
-                is_admin = username == 'neflixxx666'
+                # Добавляем игрока
                 cur.execute("""
-                    INSERT INTO players (username, session_id, status, level, avatar_emoji, is_admin) 
-                    VALUES (%s, %s, 'online', %s, %s, %s)
+                    INSERT INTO players (username, session_id, status, level, avatar_emoji) 
+                    VALUES (%s, %s, 'online', %s, %s)
                     RETURNING *
                 """, (
                     username, 
                     session_id, 
                     body_data.get('level', 1),
-                    body_data.get('avatar', '🎮'),
-                    is_admin
+                    body_data.get('avatar', '🎮')
                 ))
                 
                 new_player = dict(cur.fetchone())
@@ -136,34 +134,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     UPDATE players SET team_id = %s 
                     WHERE id = %s AND status = 'online'
                 """, (team_id, player_id))
-                conn.commit()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({'success': True})
-                }
-            
-            elif action == 'kick_player':
-                admin_username = body_data.get('admin_username')
-                target_player_id = body_data.get('target_player_id')
-                
-                # Проверяем права админа
-                if admin_username != 'neflixxx666':
-                    return {
-                        'statusCode': 403,
-                        'headers': {
-                            'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
-                        },
-                        'body': json.dumps({'error': 'Нет прав администратора'})
-                    }
-                
-                # Удаляем игрока
-                cur.execute("DELETE FROM players WHERE id = %s", (target_player_id,))
                 conn.commit()
                 
                 return {
