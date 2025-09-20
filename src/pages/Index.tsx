@@ -16,6 +16,7 @@ interface Player {
   team_name?: string
   team_color?: string
   joined_at: string
+  is_admin?: boolean
 }
 
 interface ChatMessage {
@@ -42,8 +43,12 @@ const Index = () => {
   const [isJoined, setIsJoined] = useState(false)
   const [userLevel, setUserLevel] = useState(1)
   const [userAvatar, setUserAvatar] = useState('🎮')
+  const [showAvatarGallery, setShowAvatarGallery] = useState(false)
 
-  const avatars = ['🎮', '⚡', '🚀', '💫', '⭐', '🔥', '👾', '🎯', '⚔️', '🛡️']
+  const avatars = ['🎮', '⚡', '🚀', '💫', '⭐', '🔥', '👾', '🎯', '⚔️', '🛡️', '🤖', '👽', '💀', '🎭', '🐲', '🦾', '👹', '🤡', '🦸', '🧙']
+  const avatarImages = [
+    '/img/9b80cde4-6702-47fc-8c0f-edceee1edb3a.jpg'
+  ]
 
   // Загрузка состояния лобби
   const loadLobbyState = async () => {
@@ -130,6 +135,65 @@ const Index = () => {
     }
   }
 
+  // Выгнать игрока (только для админа)
+  const kickPlayer = async (playerId: string) => {
+    if (currentUser !== 'neflixxx666') return
+    
+    try {
+      await fetch(LOBBY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'kick_player',
+          admin_username: currentUser,
+          target_player_id: playerId
+        })
+      })
+      loadLobbyState()
+    } catch (error) {
+      console.error('Ошибка выгона игрока:', error)
+    }
+  }
+
+  // Экстренная полная очистка (для отладки)
+  const forceClearAll = async () => {
+    try {
+      await fetch(LOBBY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'force_clear_all'
+        })
+      })
+      // Перезагружаем страницу для полного сброса
+      window.location.reload()
+    } catch (error) {
+      console.error('Ошибка экстренной очистки:', error)
+    }
+  }
+
+  // Очистить лобби (только для админа)
+  const clearLobby = async () => {
+    if (currentUser !== 'neflixxx666') return
+    
+    try {
+      await fetch(LOBBY_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'clear_lobby',
+          admin_username: currentUser
+        })
+      })
+      loadLobbyState()
+    } catch (error) {
+      console.error('Ошибка очистки лобби:', error)
+    }
+  }
+
+  // Проверка прав админа
+  const isCurrentUserAdmin = currentUser === 'neflixxx666'
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       if (!isJoined) {
@@ -191,8 +255,8 @@ const Index = () => {
             <div className="w-16 h-16 bg-gradient-to-r from-acid-green to-acid-purple rounded-full mx-auto mb-4 flex items-center justify-center">
               <Icon name="Gamepad2" size={32} className="text-black" />
             </div>
-            <CardTitle className="text-2xl bg-gradient-to-r from-acid-green to-acid-purple bg-clip-text text-transparent">
-              TOXIC LOBBY 5v5
+            <CardTitle className="text-2xl text-acid-green">
+              OrkeN Lobby 5 vs 5
             </CardTitle>
             <p className="text-muted-foreground">Присоединяйся к игре</p>
           </CardHeader>
@@ -222,18 +286,61 @@ const Index = () => {
             
             <div>
               <label className="text-sm text-acid-green mb-2 block">Аватар</label>
-              <div className="grid grid-cols-5 gap-2">
-                {avatars.map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => setUserAvatar(emoji)}
-                    className={`p-2 rounded border-2 text-xl hover:bg-gaming-dark/50 transition ${
-                      userAvatar === emoji ? 'border-acid-green' : 'border-border/30'
-                    }`}
-                  >
-                    {emoji}
-                  </button>
-                ))}
+              <div className="space-y-3">
+                <div className="grid grid-cols-5 gap-2">
+                  {avatars.slice(0, 10).map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => setUserAvatar(emoji)}
+                      className={`p-2 rounded border-2 text-xl hover:bg-gaming-dark/50 transition ${
+                        userAvatar === emoji ? 'border-acid-green' : 'border-border/30'
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+                
+                <Button
+                  type="button"
+                  onClick={() => setShowAvatarGallery(!showAvatarGallery)}
+                  className="w-full bg-acid-purple/20 text-acid-purple border border-acid-purple/30 hover:bg-acid-purple/30"
+                >
+                  <Icon name="Image" size={16} className="mr-2" />
+                  {showAvatarGallery ? 'Скрыть галерею' : 'Показать больше аватаров'}
+                </Button>
+                
+                {showAvatarGallery && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-5 gap-2">
+                      {avatars.slice(10).map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => setUserAvatar(emoji)}
+                          className={`p-2 rounded border-2 text-xl hover:bg-gaming-dark/50 transition ${
+                            userAvatar === emoji ? 'border-acid-green' : 'border-border/30'
+                          }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="border-t border-border/30 pt-3">
+                      <p className="text-xs text-acid-green mb-2">Кибер-аватары</p>
+                      <div className="relative">
+                        <img 
+                          src={avatarImages[0]} 
+                          alt="Gaming avatars"
+                          className="w-full h-32 object-cover rounded-lg border border-acid-green/30"
+                        />
+                        <div className="absolute inset-0 bg-gaming-bg/80 rounded-lg flex items-center justify-center">
+                          <p className="text-acid-green text-sm font-medium">Скоро доступно</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -260,14 +367,14 @@ const Index = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-acid-green to-acid-purple rounded-lg flex items-center justify-center">
+          <div className="w-12 h-12 from-acid-green to-acid-purple rounded-lg flex items-center justify-center bg-lime-500">
             <Icon name="Gamepad2" size={24} className="text-black" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-acid-green to-acid-purple bg-clip-text text-transparent">
-              TOXIC LOBBY 5v5
+            <h1 className="text-3xl font-bold text-acid-green">
+              OrkeN Lobby 5 vs 5
             </h1>
-            <p className="text-muted-foreground">Кислотное игровое лобби</p>
+            <p className="text-[#1cff00]">Кислотное игровое лобби</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -278,6 +385,15 @@ const Index = () => {
           <Badge className="bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow">
             {currentUser}
           </Badge>
+          <Button 
+            onClick={forceClearAll}
+            className="bg-red-600/80 text-white border border-red-500 hover:bg-red-600"
+            size="sm"
+            title="ЭКСТРЕННАЯ ОЧИСТКА - удалит всех игроков и сообщения"
+          >
+            <Icon name="RotateCcw" size={16} className="mr-1" />
+            СБРОС
+          </Button>
         </div>
       </div>
 
@@ -297,15 +413,34 @@ const Index = () => {
             <CardContent className="space-y-3">
               {teamAPlayers.map((player) => (
                 <div key={player.id} className="p-3 rounded-lg bg-gaming-dark/50 border border-acid-green/20">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-lg">{player.avatar_emoji}</div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-acid-green">{player.username}</h3>
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
-                        <span className="text-xs text-muted-foreground">LVL {player.level}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-lg">{player.avatar_emoji}</div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-acid-green">{player.username}</h3>
+                          {player.is_admin && (
+                            <Badge className="text-xs bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow px-1 py-0">
+                              ADMIN
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
+                          <span className="text-xs text-muted-foreground">LVL {player.level}</span>
+                        </div>
                       </div>
                     </div>
+                    {isCurrentUserAdmin && player.username !== 'neflixxx666' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => kickPlayer(player.id)}
+                        className="h-6 w-6 p-0 bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+                        title="Выгнать игрока"
+                      >
+                        <Icon name="X" size={10} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -333,15 +468,34 @@ const Index = () => {
             <CardContent className="space-y-3">
               {teamBPlayers.map((player) => (
                 <div key={player.id} className="p-3 rounded-lg bg-gaming-dark/50 border border-acid-purple/20">
-                  <div className="flex items-center space-x-3">
-                    <div className="text-lg">{player.avatar_emoji}</div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-acid-purple">{player.username}</h3>
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
-                        <span className="text-xs text-muted-foreground">LVL {player.level}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-lg">{player.avatar_emoji}</div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-acid-purple">{player.username}</h3>
+                          {player.is_admin && (
+                            <Badge className="text-xs bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow px-1 py-0">
+                              ADMIN
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
+                          <span className="text-xs text-muted-foreground">LVL {player.level}</span>
+                        </div>
                       </div>
                     </div>
+                    {isCurrentUserAdmin && player.username !== 'neflixxx666' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => kickPlayer(player.id)}
+                        className="h-6 w-6 p-0 bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+                        title="Выгнать игрока"
+                      >
+                        <Icon name="X" size={10} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -373,7 +527,14 @@ const Index = () => {
                     <div className="flex items-center space-x-3">
                       <div className="text-lg">{player.avatar_emoji}</div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{player.username}</h3>
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold text-foreground">{player.username}</h3>
+                          {player.is_admin && (
+                            <Badge className="text-xs bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow px-1 py-0">
+                              ADMIN
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex items-center space-x-2">
                           <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
                           <span className="text-xs text-muted-foreground">LVL {player.level}</span>
@@ -396,9 +557,31 @@ const Index = () => {
                     >
                       Б
                     </Button>
+                    {isCurrentUserAdmin && player.username !== 'neflixxx666' && (
+                      <Button 
+                        size="sm" 
+                        onClick={() => kickPlayer(player.id)}
+                        className="h-7 text-xs bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+                        title="Выгнать игрока"
+                      >
+                        <Icon name="X" size={12} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
+              
+              {isCurrentUserAdmin && players.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-border">
+                  <Button 
+                    onClick={clearLobby}
+                    className="w-full bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
+                  >
+                    <Icon name="Trash2" size={16} className="mr-2" />
+                    Очистить лобби
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
