@@ -175,49 +175,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'success': True})
                 }
             
-            elif action == 'force_clear_all':
-                # Принудительная очистка всех данных (без проверки админа)
-                cur.execute("DELETE FROM players")
-                cur.execute("DELETE FROM chat_messages")
-                cur.execute("DELETE FROM lobby_state")
-                conn.commit()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({'success': True, 'message': 'Все данные очищены'})
-                }
-            
-            elif action == 'clear_lobby':
-                admin_username = body_data.get('admin_username')
-                
-                # Проверяем права админа
-                if admin_username != 'neflixxx666':
-                    return {
-                        'statusCode': 403,
-                        'headers': {
-                            'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
-                        },
-                        'body': json.dumps({'error': 'Нет прав администратора'})
-                    }
-                
-                # Очищаем всех игроков
-                cur.execute("DELETE FROM players")
-                conn.commit()
-                
-                return {
-                    'statusCode': 200,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({'success': True})
-                }
-            
             elif action == 'send_message':
                 username = body_data.get('username')
                 message = body_data.get('message')

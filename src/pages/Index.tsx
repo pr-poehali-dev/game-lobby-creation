@@ -155,42 +155,6 @@ const Index = () => {
     }
   }
 
-  // Экстренная полная очистка (для отладки)
-  const forceClearAll = async () => {
-    try {
-      await fetch(LOBBY_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'force_clear_all'
-        })
-      })
-      // Перезагружаем страницу для полного сброса
-      window.location.reload()
-    } catch (error) {
-      console.error('Ошибка экстренной очистки:', error)
-    }
-  }
-
-  // Очистить лобби (только для админа)
-  const clearLobby = async () => {
-    if (currentUser !== 'neflixxx666') return
-    
-    try {
-      await fetch(LOBBY_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'clear_lobby',
-          admin_username: currentUser
-        })
-      })
-      loadLobbyState()
-    } catch (error) {
-      console.error('Ошибка очистки лобби:', error)
-    }
-  }
-
   // Проверка прав админа
   const isCurrentUserAdmin = currentUser === 'neflixxx666'
 
@@ -367,14 +331,14 @@ const Index = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 from-acid-green to-acid-purple rounded-lg flex items-center justify-center bg-lime-500">
+          <div className="w-12 h-12 bg-gradient-to-r from-acid-green to-acid-purple rounded-lg flex items-center justify-center">
             <Icon name="Gamepad2" size={24} className="text-black" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-acid-green">
               OrkeN Lobby 5 vs 5
             </h1>
-            <p className="text-[#1cff00]">Кислотное игровое лобби</p>
+            <p className="text-acid-purple">Кислотное игровое лобби</p>
           </div>
         </div>
         <div className="flex items-center space-x-4">
@@ -385,15 +349,6 @@ const Index = () => {
           <Badge className="bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow">
             {currentUser}
           </Badge>
-          <Button 
-            onClick={forceClearAll}
-            className="bg-red-600/80 text-white border border-red-500 hover:bg-red-600"
-            size="sm"
-            title="ЭКСТРЕННАЯ ОЧИСТКА - удалит всех игроков и сообщения"
-          >
-            <Icon name="RotateCcw" size={16} className="mr-1" />
-            СБРОС
-          </Button>
         </div>
       </div>
 
@@ -413,34 +368,15 @@ const Index = () => {
             <CardContent className="space-y-3">
               {teamAPlayers.map((player) => (
                 <div key={player.id} className="p-3 rounded-lg bg-gaming-dark/50 border border-acid-green/20">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-lg">{player.avatar_emoji}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-acid-green">{player.username}</h3>
-                          {player.is_admin && (
-                            <Badge className="text-xs bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow px-1 py-0">
-                              ADMIN
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
-                          <span className="text-xs text-muted-foreground">LVL {player.level}</span>
-                        </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="text-lg">{player.avatar_emoji}</div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-acid-green">{player.username}</h3>
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
+                        <span className="text-xs text-muted-foreground">LVL {player.level}</span>
                       </div>
                     </div>
-                    {isCurrentUserAdmin && player.username !== 'neflixxx666' && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => kickPlayer(player.id)}
-                        className="h-6 w-6 p-0 bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
-                        title="Выгнать игрока"
-                      >
-                        <Icon name="X" size={10} />
-                      </Button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -468,34 +404,15 @@ const Index = () => {
             <CardContent className="space-y-3">
               {teamBPlayers.map((player) => (
                 <div key={player.id} className="p-3 rounded-lg bg-gaming-dark/50 border border-acid-purple/20">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="text-lg">{player.avatar_emoji}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-acid-purple">{player.username}</h3>
-                          {player.is_admin && (
-                            <Badge className="text-xs bg-toxic-yellow/20 text-toxic-yellow border-toxic-yellow px-1 py-0">
-                              ADMIN
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
-                          <span className="text-xs text-muted-foreground">LVL {player.level}</span>
-                        </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="text-lg">{player.avatar_emoji}</div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-acid-purple">{player.username}</h3>
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-2 h-2 rounded-full ${getStatusColor(player.status)}`}></div>
+                        <span className="text-xs text-muted-foreground">LVL {player.level}</span>
                       </div>
                     </div>
-                    {isCurrentUserAdmin && player.username !== 'neflixxx666' && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => kickPlayer(player.id)}
-                        className="h-6 w-6 p-0 bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
-                        title="Выгнать игрока"
-                      >
-                        <Icon name="X" size={10} />
-                      </Button>
-                    )}
                   </div>
                 </div>
               ))}
@@ -570,18 +487,6 @@ const Index = () => {
                   </div>
                 </div>
               ))}
-              
-              {isCurrentUserAdmin && players.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-border">
-                  <Button 
-                    onClick={clearLobby}
-                    className="w-full bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30"
-                  >
-                    <Icon name="Trash2" size={16} className="mr-2" />
-                    Очистить лобби
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
