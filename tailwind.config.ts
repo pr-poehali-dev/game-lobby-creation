@@ -62,11 +62,12 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				'neon-cyan': '#00FFFF',
-				'neon-pink': '#FF0080',
-				'gaming-bg': '#1A1A2E',
-				'gaming-dark': '#16213E',
-				'gaming-secondary': '#0F3460'
+				'acid-green': '#39FF14',
+				'acid-purple': '#BF00FF',
+				'toxic-yellow': '#CCFF00',
+				'gaming-bg': '#0A0A0A',
+				'gaming-dark': '#1A0A1A',
+				'gaming-secondary': '#2A1A2A'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
